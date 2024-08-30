@@ -8,7 +8,9 @@ ENV KC_METRICS_ENABLED=true
 # Configure a database vendor
 ENV KC_DB=postgres
 
-# TODO install provider
+# install provider
+COPY ./user-storage-spi/build/libs/keycloak_userStorageProvider_SPI-0.0.1-SNAPSHOT.jar /opt/keycloak/providers
+
 WORKDIR /opt/keycloak
 RUN /opt/keycloak/bin/kc.sh build
 

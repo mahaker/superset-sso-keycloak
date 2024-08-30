@@ -21,3 +21,5 @@
 !.gitignore
 !superset_config.py
 !superset_config_local.example
+!client_secret.json
+!keycloak_security_manager.py

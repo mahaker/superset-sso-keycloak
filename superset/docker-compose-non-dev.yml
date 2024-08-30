@@ -73,6 +73,9 @@ services:
       - 8088:8088
     depends_on: *superset-depends-on
     volumes: *superset-volumes
+    extra_hosts:
+      - host.docker.internal:host-gateway 
+      - localhost:host-gateway # Connected Keycloak from Superset to 
 
   superset-init:
     container_name: superset_init
@@ -110,6 +113,9 @@ services:
           "CMD-SHELL",
           "celery -A superset.tasks.celery_app:app inspect ping -d celery@$$HOSTNAME",
         ]
+    extra_hosts:
+      - host.docker.internal:host-gateway 
+      - localhost:host-gateway # Connected Keycloak from Superset
 
   superset-worker-beat:
     build:
@@ -127,6 +133,26 @@ services:
     volumes: *superset-volumes
     healthcheck:
       disable: true
+    extra_hosts:
+      - host.docker.internal:host-gateway 
+      - localhost:host-gateway # Connected Keycloak from Superset
+  
+  # user-and-keycloak-db:
+  #   container_name: user_and_keycloak_db
+  #   env_file: ../env.list
+  #   build:
+  #     context: ../postgres
+  #   restart: unless-stopped
+
+  # oidc-provider:
+  #   container_name: oidc_provider
+  #   env_file: ../env.list
+  #   build:
+  #     context: ../keycloak
+  #   command: ["start-dev"]
+  #   ports:
+  #     - 8080:8080
+  #   restart: unless-stopped
 
 volumes:
   superset_home:

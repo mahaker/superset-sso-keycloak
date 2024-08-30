@@ -25,8 +25,36 @@ import os
 
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
+from keycloak_security_manager import OIDCSecurityManager
+from flask_appbuilder.security.manager import AUTH_OID, AUTH_REMOTE_USER, AUTH_DB, AUTH_LDAP, AUTH_OAUTH
 
 logger = logging.getLogger()
+
+# AUTH_TYPE = AUTH_OID
+AUTH_TYPE = AUTH_OAUTH
+OAUTH_PROVIDERS = [
+    {
+        "name": "keycloak",
+        "icon": "fa-key",
+        "token_key": "access_token",
+        "remote_app": {
+            "client_id": "Superset",
+            # "client_secret": os.getenv("OAUTH_CLIENT_SECRET", None),
+            "client_secret": "SupersetKey", # anything good
+            "client_kwargs": {"scope": "openid"},
+            "server_metadata_url": "http://localhost:8080/realms/superset/.well-known/openid-configuration"
+        }
+    }
+]
+AUTH_ROLES_MAPPING = {
+    "user": ["Admin"]
+}
+CUSTOM_SECURITY_MANAGER = OIDCSecurityManager
+AUTH_ROLES_SYNC_AT_LOGIN = True
+# Will allow user self registration, allowing to create Flask users from Authorized User
+AUTH_USER_REGISTRATION = True
+# The default user self registration role
+AUTH_USER_REGISTRATION_ROLE = 'Public'
 
 DATABASE_DIALECT = os.getenv("DATABASE_DIALECT")
 DATABASE_USER = os.getenv("DATABASE_USER")
