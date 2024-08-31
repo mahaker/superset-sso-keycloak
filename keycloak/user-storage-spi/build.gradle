@@ -16,4 +16,7 @@ dependencies {
     compileOnly group: 'org.keycloak', name: 'keycloak-core', version: '25.0.0'
     compileOnly group: 'org.keycloak', name: 'keycloak-server-spi-private', version: '25.0.0'
     compileOnly group: 'org.keycloak', name: 'keycloak-services', version: '25.0.0'
+
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
 }
