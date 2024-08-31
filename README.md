@@ -23,14 +23,15 @@ psql -h localhost -d mydb -U test_user -p 5435 -f ./postgres/user-data.sql
 1. Login to Keycloak
    - username: `admin`
    - password: `change_me`
-1. Create realm `superset`
-1. Open `Clients`
-1. Import Client (upload `Superset.json`)
-1. Open `Realm settings` > `User profile`
-1. email,firstName,lastName to not required
+1. Import realm (upload `realm-export.json`)
 1. Open `User federation`
 1. Add provider `custom_user_storage_provider provider`
+1. Settings provider
+   - database url: `jdbc:postgresql://host.docker.internal:5435/mydb`
+   - username: test_user
+   - password: test_password
 1. Open [Superset](http://localhost:8088)
 1. Login to Superset
-   - username: `soufiane`
-   - password: `123`
+   - username: `st_001`
+   - password: `password001`
+
