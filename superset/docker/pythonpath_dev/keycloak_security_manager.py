@@ -32,31 +32,27 @@ class OIDCSecurityManager(SupersetSecurityManager):
     def __init__(self, appbuilder):
         super(OIDCSecurityManager, self).__init__(appbuilder)
         self.authoauthview = AuthOIDCView
-        # app = self.appbuilder.get_app
-        # app.config.setdefault("AUTH_ROLES_MAPPING", {})
-        # app.config.setdefault("AUTH_TYPE", AUTH_OAUTH)
 
     # override Flask Appbuilder
     # https://flask-appbuilder.readthedocs.io/en/latest/_modules/flask_appbuilder/security/manager.html
     def auth_user_oauth(self, userinfo):
-        log = logging.getLogger("TEST")
-        log.debug("auth_user_oauth userinfo.username: %s", userinfo["username"])
-        log.debug("auth_user_oauth userinfo.email: %s", userinfo["email"])
-
         # if "email" not duplicated, insert ab_user.
         # Preventing inserts to ab_user even after the second login.
         user = self.find_user(email=userinfo["email"])
         if (not user):
-            user_role_objects=set()
+            user_role_objects = set()
 
-            user_role_keys = userinfo.get("role_keys", [])
-            user_role_objects.update(self.get_roles_from_keys(user_role_keys))
+            # user_role_keys = userinfo.get("role_keys", [])
+            # user_role_objects.update(self.get_roles_from_keys(user_role_keys))
+
+            # Direct mapping superset role
+            user_role_objects.update([self.find_role(userinfo.get("custom_group", ""))])
 
             user = self.add_user(
                 username=userinfo["username"],
-                first_name=userinfo.get("first_name", ""),
-                last_name=userinfo.get("last_name", ""),
-                email=userinfo.get("email", ""),
+                first_name=userinfo["first_name"],
+                last_name=userinfo["last_name"],
+                email=userinfo["email"],
                 role=list(user_role_objects),
             )
         if user:
@@ -68,8 +64,6 @@ class OIDCSecurityManager(SupersetSecurityManager):
     def oauth_user_info(self, provider, resp=None):
         log = logging.getLogger("TEST")
         if provider == "keycloak":
-            # log.debug("Keycloak response received : {0}".format(resp))
-            # log.debug("ID Token: %s", resp["id_token"])
             me = self.appbuilder.sm.oauth_remotes[provider].get(
                 f'http://localhost:8080/realms/superset/protocol/openid-connect/userinfo'
             )
@@ -78,12 +72,13 @@ class OIDCSecurityManager(SupersetSecurityManager):
             log.debug("User info from Keycloak: %s", data)
             return {
                 "name": data["preferred_username"],
-                "email": data["preferred_username"] + '@example.com',
-                "first_name": data["preferred_username"],
-                "last_name": data["preferred_username"],
+                "email": data["email"],
+                "first_name": data["first_name"],
+                "last_name": data["last_name"],
                 "id": data["sub"],
                 "username": data["preferred_username"],
-                "role_keys": ["user"]
+                "custom_group": data["custom_group"],
+                "role_keys": [data["custom_group"]]
             }
 
 # class OIDCSecurityManager(SupersetSecurityManager):

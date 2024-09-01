@@ -26,6 +26,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 public class CustomUserStorageProvider implements UserStorageProvider, CredentialInputValidator, UserLookupProvider {
     private KeycloakSession session;
@@ -76,7 +78,6 @@ public class CustomUserStorageProvider implements UserStorageProvider, Credentia
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput credentialInput) {
-        System.out.println("given credentials : \nusername : " + user.getUsername() + ", password : " + credentialInput.getChallengeResponse());
         if (!supportsCredentialType(credentialInput.getType())) return false;
         try {
             // here we can add a database treatment instead of a static hashmap
@@ -92,21 +93,42 @@ public class CustomUserStorageProvider implements UserStorageProvider, Credentia
         }
     }
 
-    private UserModel createAdapter(RealmModel realm, String username) {
+    private UserModel createAdapter(RealmModel realm, UserDto dto) {
         return new AbstractUserAdapter(this.session, realm, this.model) {
             @Override
             public String getUsername() {
-                return username;
+                return dto.getUserCd();
             }
 
             @Override
             public String getFirstName() {
-                return "First" + username;
+                return dto.getUserName(); // TODO split white space
             }
 
             @Override
             public String getLastName() {
-                return "Last" + username;
+                return dto.getUserName(); // TODO split white space
+            }
+
+            @Override
+            public String getEmail() {
+                return dto.getUserCd() + "@example.com";
+            }
+
+            @Override
+            public Map<String, List<String>> getAttributes() {
+                return Map.of(
+                    "username", List.of(getUsername()),
+                    "email", List.of(getEmail()),
+                    "first_name", List.of(getFirstName()),
+                    "last_name", List.of(getLastName()),
+                    "custom_group", List.of(dto.getSupersetRoleName())
+                );
+            }
+            
+            @Override
+            public Stream<String> getAttributeStream(String name) {
+                return Stream.of("username", "email", "first_name", "last_name", "custom_group");
             }
 
             @Override
@@ -128,7 +150,7 @@ public class CustomUserStorageProvider implements UserStorageProvider, Credentia
         try {
             final UserDto dto = fetchUserByUsername(username);
             if (dto != null) {
-                return createAdapter(realm, username);
+                return createAdapter(realm, dto);
             }
 
             return null;

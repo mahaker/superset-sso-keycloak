@@ -7,13 +7,13 @@ public class UserDto {
     private final String userCd;
     private final String userName;
     private final String userPassword;
-    private final Integer userType;
+    private final String supersetRoleName;
 
     public UserDto(ResultSet rs) throws SQLException {
         this.userCd = rs.getString("user_cd");
         this.userName = rs.getString("user_name");
         this.userPassword = rs.getString("user_password");
-        this.userType = rs.getInt("user_type");
+        this.supersetRoleName = rs.getString("superset_role_name");
     }
 
     public String getUserCd() {
@@ -28,7 +28,7 @@ public class UserDto {
         return userPassword;
     }
 
-    public Integer getUserType() {
-        return userType;
+    public String getSupersetRoleName() {
+        return supersetRoleName;
     }
 }

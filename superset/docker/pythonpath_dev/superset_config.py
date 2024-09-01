@@ -30,7 +30,6 @@ from flask_appbuilder.security.manager import AUTH_OID, AUTH_REMOTE_USER, AUTH_D
 
 logger = logging.getLogger()
 
-# AUTH_TYPE = AUTH_OID
 AUTH_TYPE = AUTH_OAUTH
 OAUTH_PROVIDERS = [
     {
@@ -46,9 +45,6 @@ OAUTH_PROVIDERS = [
         }
     }
 ]
-AUTH_ROLES_MAPPING = {
-    "user": ["Admin"]
-}
 CUSTOM_SECURITY_MANAGER = OIDCSecurityManager
 AUTH_ROLES_SYNC_AT_LOGIN = True
 # Will allow user self registration, allowing to create Flask users from Authorized User
