@@ -11,6 +11,9 @@ ENV KC_DB=postgres
 # install provider
 COPY ./user-storage-spi/build/libs/keycloak_userStorageProvider_SPI-0.0.1-SNAPSHOT.jar /opt/keycloak/providers
 
+# install theme
+COPY ./mytheme/ /opt/keycloak/themes/mytheme
+
 WORKDIR /opt/keycloak
 RUN /opt/keycloak/bin/kc.sh build
 
