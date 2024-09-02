@@ -7,11 +7,7 @@ cd postgres
 docker build -t my_postgres .
 docker run --name my_postgres -p 5435:5432 --env-file ../env.list -d my_postgres
 
-# Build User Storage SPI
-cd ../keycloak/user-storage-spi
-./gradlew build
-
-cd ../
+cd ../keycloak
 docker build -t my_keycloak .
 # TODO production settings
 # TODO enable /health endpoint(currently, 'Resource not found')
