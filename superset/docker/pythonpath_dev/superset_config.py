@@ -26,7 +26,7 @@ import os
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
 from keycloak_security_manager import OIDCSecurityManager
-from flask_appbuilder.security.manager import AUTH_OID, AUTH_REMOTE_USER, AUTH_DB, AUTH_LDAP, AUTH_OAUTH
+from flask_appbuilder.security.manager import AUTH_OAUTH
 
 logger = logging.getLogger()
 
@@ -41,7 +41,7 @@ OAUTH_PROVIDERS = [
             # "client_secret": os.getenv("OAUTH_CLIENT_SECRET", None),
             "client_secret": "SupersetKey", # anything good
             "client_kwargs": {"scope": "openid"},
-            "server_metadata_url": "http://localhost:8080/realms/superset/.well-known/openid-configuration"
+            "server_metadata_url": os.getenv("KEYCLOAK_HOST") + "/realms/superset/.well-known/openid-configuration"
         }
     }
 ]

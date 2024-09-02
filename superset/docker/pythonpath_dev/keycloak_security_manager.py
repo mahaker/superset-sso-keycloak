@@ -1,3 +1,5 @@
+import os
+
 from flask_appbuilder.security.manager import AUTH_OID, AUTH_REMOTE_USER, AUTH_DB, AUTH_LDAP, AUTH_OAUTH
 from superset.security import SupersetSecurityManager
 from flask_oidc import OpenIDConnect
@@ -15,9 +17,9 @@ class AuthOIDCView(AuthOAuthView):
     @expose('/logout/', methods=['GET', 'POST'])
     def logout(self):
         # keycloak_logout_url = "http://<keycloak host>/realms/<realm>/protocol/openid-connect/logout"
-        keycloak_logout_url = "http://localhost:8080/realms/superset/protocol/openid-connect/logout"
+        keycloak_logout_url = os.getenv("KEYCLOAK_HOST") + "/realms/superset/protocol/openid-connect/logout"
         # logout_redirect_url = 'http://<superset host>/oauth-authorized/<provider name>'
-        logout_redirect_url = 'http://localhost:8088/oauth-authorized/keycloak'
+        logout_redirect_url = os.getenv("SUPERSET_HOST") + "/oauth-authorized/keycloak"
         # client_id = keycloak's client id
         client_id = 'Superset'
         self.appbuilder.app.config["LOGOUT_REDIRECT_URL"] = ("{0}?client_id={1}&post_logout_redirect_uri={2}".format(
@@ -56,6 +58,11 @@ class OIDCSecurityManager(SupersetSecurityManager):
                 role=list(user_role_objects),
             )
         if user:
+            # TODO update user roles
+            # user_role_objects = set()
+            # user_role_objects.update([self.find_role(userinfo.get("custom_group", ""))])
+            # user.roles = list(user_role_objects)
+            # self.update_user(user)
             self.update_user_auth_stat(user)
             return user
 
@@ -65,7 +72,7 @@ class OIDCSecurityManager(SupersetSecurityManager):
         log = logging.getLogger("TEST")
         if provider == "keycloak":
             me = self.appbuilder.sm.oauth_remotes[provider].get(
-                f'http://localhost:8080/realms/superset/protocol/openid-connect/userinfo'
+                os.getenv("KEYCLOAK_HOST") + '/realms/superset/protocol/openid-connect/userinfo'
             )
             me.raise_for_status()
             data = me.json()
