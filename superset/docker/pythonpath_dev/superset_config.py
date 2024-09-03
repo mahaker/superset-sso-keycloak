@@ -38,8 +38,7 @@ OAUTH_PROVIDERS = [
         "token_key": "access_token",
         "remote_app": {
             "client_id": "Superset",
-            # "client_secret": os.getenv("OAUTH_CLIENT_SECRET", None),
-            "client_secret": "SupersetKey", # anything good
+            "client_secret": os.getenv("OAUTH_CLIENT_SECRET"),
             "client_kwargs": {"scope": "openid"},
             "server_metadata_url": os.getenv("KEYCLOAK_HOST") + "/realms/superset/.well-known/openid-configuration"
         }
